@@ -20,6 +20,8 @@ data class CoinUi(
     val marketCapUsd: DisplayableNumber,
     val priceUsd: DisplayableNumber,
     val changePercent24Hr: DisplayableNumber,
+    val absoluteChange24Hr: DisplayableNumber,
+    val hasPositiveTrend: Boolean,
     @DrawableRes val iconRes: Int
 )
 
@@ -40,11 +42,13 @@ fun Coin.toCoinUi() = CoinUi(
     priceUsd = priceUsd.toDisplayableNumber(),
     marketCapUsd = marketCapUsd.toDisplayableNumber(),
     changePercent24Hr = changePercent24Hr.toDisplayableNumber(),
-    iconRes = getDrawableIdForCoin(symbol = symbol)
+    iconRes = getDrawableIdForCoin(symbol = symbol),
+    absoluteChange24Hr = (priceUsd.toDisplayableNumber().value * (changePercent24Hr.toDisplayableNumber().value / 100)).toDisplayableNumber(),
+    hasPositiveTrend = changePercent24Hr > 0.0
 )
 
 /** All the value we format will have exactly 2 decimal places */
-fun Double.toDisplayableNumber() : DisplayableNumber{
+fun Double.toDisplayableNumber(): DisplayableNumber {
     val formatter = NumberFormat.getNumberInstance(Locale.getDefault()).apply {
         minimumFractionDigits = 2
         maximumFractionDigits = 2
