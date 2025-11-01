@@ -13,6 +13,8 @@ import com.plcoding.cryptotracker.crypto.presentation.models.CoinUi
  *  actions are bundle into an Action Class, which is a sealed (limited
  *  number of options) interface.
  *  This class bundles these different actions for a single screen.
+ *
+ *  One time information we send from UI to viewModel
  *  */
 sealed interface CoinListAction {
     data class OnCoinClick(val coinUi: CoinUi) : CoinListAction
