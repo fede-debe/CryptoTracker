@@ -2,6 +2,7 @@ package com.plcoding.cryptotracker.core.presentation
 
 import com.plcoding.cryptotracker.R
 
+/** Api will return symbol string, we map it to corresponding drawable id */
 fun getDrawableIdForCoin(symbol: String): Int {
     return when (symbol.uppercase()) {
         "1INCH" -> R.drawable._inch
