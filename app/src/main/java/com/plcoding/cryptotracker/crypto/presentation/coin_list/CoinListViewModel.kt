@@ -6,9 +6,11 @@ import com.plcoding.cryptotracker.core.domain.onError
 import com.plcoding.cryptotracker.core.domain.onSuccess
 import com.plcoding.cryptotracker.crypto.domain.CoinDataSource
 import com.plcoding.cryptotracker.crypto.presentation.models.toCoinUi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,13 +71,25 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
             CoinListState()
         )
 
+    /** We are going to use a Channel to handle CoinListEvent
+     *  Channel is very similar to a shared flow (type of flow
+     *  where these emissions (error happens in this case) are
+     *  just sent into once (not cached unlike a StateFlow where
+     *  the emissions are cached and would be re-emitted when a
+     *  new subscriber appears like after a screen rotation).
+     *
+     *  In Channel or SharedFlow these emissions will not be
+     *  recalled we a new subscriber appears
+     *  */
+    private val _events = Channel<CoinListEvent>()
+    val events = _events.receiveAsFlow()
+
     fun onActions(action: CoinListAction) {
         when (action) {
             is CoinListAction.OnCoinClick -> {}
             CoinListAction.OnRefresh -> { loadCoins() }
         }
     }
-
 
     /** coroutines scope is need to execute a suspend function */
     private fun loadCoins() {
@@ -91,6 +105,10 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
                 }
                 .onError { error ->
                     _uiState.update { state -> state.copy(isLoading = false) }
+                    /** we use send to actually send an event into the channel
+                     * which you can observe in the UI
+                     * */
+                    _events.send(CoinListEvent.Error(error))
                 }
         }
     }
