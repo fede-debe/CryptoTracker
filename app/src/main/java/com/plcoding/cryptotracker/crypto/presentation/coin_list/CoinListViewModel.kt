@@ -86,8 +86,13 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
 
     fun onActions(action: CoinListAction) {
         when (action) {
-            is CoinListAction.OnCoinClick -> {}
-            CoinListAction.OnRefresh -> { loadCoins() }
+            is CoinListAction.OnCoinClick -> {
+                selectCoin(action)
+            }
+
+            CoinListAction.OnRefresh -> {
+                loadCoins()
+            }
         }
     }
 
@@ -110,6 +115,14 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
                      * */
                     _events.send(CoinListEvent.Error(error))
                 }
+        }
+    }
+
+    private fun selectCoin(action: CoinListAction.OnCoinClick) {
+        _uiState.update { state ->
+            state.copy(
+                selectedCoin = action.coinUi
+            )
         }
     }
 }
