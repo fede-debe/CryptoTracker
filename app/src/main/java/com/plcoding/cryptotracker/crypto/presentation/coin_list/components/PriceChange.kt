@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,7 +39,7 @@ fun PriceChange(
 
     val imgVector = if (change.value < 0.0) {
         Icons.Default.KeyboardArrowDown
-    } else Icons.Default.KeyboardArrowDown
+    } else Icons.Default.KeyboardArrowUp
 
     Row(
         modifier = modifier

@@ -43,7 +43,7 @@ fun Coin.toCoinUi() = CoinUi(
     marketCapUsd = marketCapUsd.toDisplayableNumber(),
     changePercent24Hr = changePercent24Hr.toDisplayableNumber(),
     iconRes = getDrawableIdForCoin(symbol = symbol),
-    absoluteChange24Hr = (priceUsd.toDisplayableNumber().value * (changePercent24Hr.toDisplayableNumber().value / 100)).toDisplayableNumber(),
+    absoluteChange24Hr = (priceUsd * (changePercent24Hr / 100)).toDisplayableNumber(),
     hasPositiveTrend = changePercent24Hr > 0.0
 )
 
