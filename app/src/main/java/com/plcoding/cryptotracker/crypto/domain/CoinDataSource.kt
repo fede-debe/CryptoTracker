@@ -2,6 +2,7 @@ package com.plcoding.cryptotracker.crypto.domain
 
 import com.plcoding.cryptotracker.core.domain.NetworkError
 import com.plcoding.cryptotracker.core.domain.Result
+import java.time.ZonedDateTime
 
 /** Defining what a CoinDataSource consist of, what kind of
  * data we expect it to return, not how returns it (implementation
@@ -14,4 +15,10 @@ import com.plcoding.cryptotracker.core.domain.Result
  * */
 interface CoinDataSource {
     suspend fun getCoins(): Result<List<Coin>, NetworkError>
+    suspend fun getCoinHistory(
+        coinId: String,
+        // convenient to decide what kind of boundary times we pass here
+        start: ZonedDateTime,
+        end: ZonedDateTime
+    ): Result<List<CoinPrice>, NetworkError>
 }
