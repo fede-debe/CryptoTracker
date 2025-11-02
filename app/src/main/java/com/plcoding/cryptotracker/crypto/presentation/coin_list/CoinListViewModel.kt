@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.plcoding.cryptotracker.core.domain.onError
 import com.plcoding.cryptotracker.core.domain.onSuccess
 import com.plcoding.cryptotracker.crypto.domain.CoinDataSource
+import com.plcoding.cryptotracker.crypto.presentation.models.CoinUi
 import com.plcoding.cryptotracker.crypto.presentation.models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.ZonedDateTime
 
 /**
  * VM it is kind of the logic behind the UI.
@@ -87,7 +89,7 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
     fun onActions(action: CoinListAction) {
         when (action) {
             is CoinListAction.OnCoinClick -> {
-                selectCoin(action)
+                selectCoin(action.coinUi)
             }
 
             CoinListAction.OnRefresh -> {
@@ -118,11 +120,28 @@ class CoinListViewModel(private val coinDataSource: CoinDataSource) : ViewModel(
         }
     }
 
-    private fun selectCoin(action: CoinListAction.OnCoinClick) {
+    private fun selectCoin(coinUi: CoinUi) {
         _uiState.update { state ->
             state.copy(
-                selectedCoin = action.coinUi
+                selectedCoin = coinUi
             )
+        }
+
+        /** We load coins from 5 days ago till now.
+         *  Since we load a price change for every
+         *  6 hours, we got 4 price changes every 24
+         *  hours. This provides 20 price changes
+         *  when we load coins from 5 days ago till now.
+         *   */
+        viewModelScope.launch {
+            coinDataSource.getCoinHistory(
+                coinId = coinUi.id,
+                start = ZonedDateTime.now().minusDays(5),
+                end = ZonedDateTime.now()
+            ).onSuccess { history -> println(history) }
+                .onError { networkError ->
+                    _events.send(CoinListEvent.Error(networkError))
+                }
         }
     }
 }
